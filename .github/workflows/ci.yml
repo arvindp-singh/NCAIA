@@ -58,20 +58,30 @@ jobs:
             PREV_COMMIT=$(git rev-parse HEAD)
             echo "Previous commit: $PREV_COMMIT"
 
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
             docker compose up -d --build
 
             echo "Waiting for health check..."
             sleep 15
 
-            STATUS=$(docker inspect --format='{{.State.Health.Status}}' ncaiausa-app || echo "unknown")
+            STATUS=$(docker inspect --format='{{.State.Health.Status}}' ncaiausa-app 2>/dev/null || echo "none")
 
-            if [ "$STATUS" != "healthy" ]; then
-              echo "Deployment unhealthy (status: $STATUS). Rolling back to $PREV_COMMIT"
+            if [ "$STATUS" = "unhealthy" ]; then
+              echo "Deployment unhealthy. Rolling back to $PREV_COMMIT"
               git reset --hard "$PREV_COMMIT"
               docker compose up -d --build
               echo "Rollback complete."
               exit 1
             fi
 
-            echo "Deployment healthy."
+            RUNNING=$(docker inspect --format='{{.State.Running}}' ncaiausa-app 2>/dev/null || echo "false")
+            if [ "$RUNNING" != "true" ]; then
+              echo "Container not running. Rolling back to $PREV_COMMIT"
+              git reset --hard "$PREV_COMMIT"
+              docker compose up -d --build
+              echo "Rollback complete."
+              exit 1
+            fi
+
+            echo "Deployment successful (status: $STATUS)."
