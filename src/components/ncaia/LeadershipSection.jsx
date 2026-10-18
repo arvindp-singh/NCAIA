@@ -1,27 +1,27 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Crown, Users, Lightbulb } from 'lucide-react';
-import useScrollAnimation from '@/hooks/useScrollAnimation';
-import { aboutPageContent } from '@/content/aboutContent';
+import React from "react";
+import { motion } from "framer-motion";
+import { Crown, Users, Lightbulb } from "lucide-react";
+import useScrollAnimation from "@/hooks/useScrollAnimation";
+import { aboutPageContent } from "@/content/aboutContent";
 
 const { leadership } = aboutPageContent;
 const iconMap = { Crown, Users, Lightbulb };
 
 const avatarPalettes = [
-  'from-saffron to-saffron-dark',
-  'from-navy to-navy-light',
-  'from-emerald to-emerald-light',
-  'from-brass to-brass-dark',
+  "from-saffron to-saffron-dark",
+  "from-navy to-navy-light",
+  "from-emerald to-emerald-light",
+  "from-brass to-brass-dark",
 ];
 
 const getInitials = (name) =>
   name
-    .replace(/^(Dr\.|Mr\.|Mrs\.|Ms\.)\s*/i, '')
-    .split(' ')
+    .replace(/^(Dr\.|Mr\.|Mrs\.|Ms\.)\s*/i, "")
+    .split(" ")
     .filter(Boolean)
     .slice(0, 2)
     .map((w) => w[0])
-    .join('')
+    .join("")
     .toUpperCase();
 
 const Group = ({ group }) => {
@@ -39,27 +39,45 @@ const Group = ({ group }) => {
         <div className="w-11 h-11 rounded-xl bg-saffron/10 flex items-center justify-center">
           <Icon size={22} className="text-saffron-dark" />
         </div>
-        <h3 className="font-display text-2xl font-bold text-navy">{group.title}</h3>
+        <h3 className="font-display text-2xl font-bold text-navy">
+          {group.title}
+        </h3>
       </motion.div>
       <motion.div
         initial="hidden"
-        animate={isVisible ? 'show' : 'hidden'}
+        animate={isVisible ? "show" : "hidden"}
         variants={{ show: { transition: { staggerChildren: 0.05 } } }}
         className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5"
       >
         {group.members.map((m, i) => (
           <motion.div
             key={m.name}
-            variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              show: { opacity: 1, y: 0 },
+            }}
             className="group flex flex-col items-center text-center bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-navy/8 hover:border-saffron/30 transition-all duration-400 hover:-translate-y-1 p-6"
           >
             <div
-              className={`w-16 h-16 rounded-full bg-gradient-to-br ${avatarPalettes[i % avatarPalettes.length]} flex items-center justify-center text-white font-bold text-lg mb-4 shadow-md`}
+              className={`w-16 h-16 rounded-full ${m.image ? "overflow-hidden ring-2 ring-saffron/30" : `bg-gradient-to-br ${avatarPalettes[i % avatarPalettes.length]}`} flex items-center justify-center text-white font-bold text-lg mb-4 shadow-md`}
             >
-              {getInitials(m.name)}
+              {m.image ? (
+                <img
+                  src={m.image}
+                  alt={m.name}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              ) : (
+                getInitials(m.name)
+              )}
             </div>
-            <h4 className="font-display font-semibold text-navy text-base leading-tight">{m.name}</h4>
-            <p className="text-saffron-dark text-sm font-medium mt-1.5">{m.role}</p>
+            <h4 className="font-display font-semibold text-navy text-base leading-tight">
+              {m.name}
+            </h4>
+            <p className="text-saffron-dark text-sm font-medium mt-1.5">
+              {m.role}
+            </p>
           </motion.div>
         ))}
       </motion.div>
@@ -71,7 +89,10 @@ export default function LeadershipSection() {
   const [ref, isVisible] = useScrollAnimation();
 
   return (
-    <section id="leadership" className="py-24 sm:py-32 bg-gradient-to-b from-white to-saffron/5">
+    <section
+      id="leadership"
+      className="py-24 sm:py-32 bg-gradient-to-b from-white to-saffron/5"
+    >
       <div ref={ref} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
